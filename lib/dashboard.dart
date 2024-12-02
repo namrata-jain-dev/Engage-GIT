@@ -1,9 +1,16 @@
 
+import 'package:engage/login_screen.dart';
+import 'package:engage/profile.dart';
+import 'package:engage/updates.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import 'auth_service.dart';
 import 'cultural_fest.dart';
+import 'notification.dart';
 
 
 
@@ -34,7 +41,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   ];
   final List<Map<String, dynamic>> eventCategories = [
     {
-      'title': "Cultural",
+      'title': "Cultural Events",
+      // 'color': Colors.white,
       'color': Colors.purple[100],
       'imagePath': "assets/Images/cultural_grid.png", // Replace with your asset path
       'onTap': () {
@@ -43,7 +51,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
       },
     },
     {
-      'title': "Sports",
+      'title': "Sports Events",
+      // 'color': Colors.white,
       'color': Colors.yellow[100],
       'imagePath':"assets/Images/sport_grid.png",
       'onTap': () {
@@ -51,16 +60,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
       },
     },
     {
-      'title': "Social",
+      'title': "Social Events",
       'color': Colors.green[100],
+      // 'color': Colors.white,
       'imagePath': "assets/Images/social_grid.jpg",
       'onTap': () {
         print("Social Event Clicked");
       },
     },
     {
-      'title': "Technical",
+      'title': "Technical Events",
       'color': Colors.red[100],
+      // 'color': Colors.white,
       'imagePath': "assets/Images/tech_grid.png",
       'onTap': () {
         print("Technical Event Clicked");
@@ -79,25 +90,35 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   int _currentIndex = 0 ;
+  final _auth = AuthService();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      drawer: Drawer(),
+      // drawer: Drawer(),
+
       appBar: AppBar(
+
         iconTheme: IconThemeData(
-          color: Colors.white
+          color: Colors.black
         ),
-        backgroundColor: Colors.teal,
-        title: const Text('Engage GIT',style: TextStyle(color: Colors.white),),
+        // backgroundColor: Colors.teal,
+        backgroundColor: Colors.white,
+        title: const Text('  Engage GIT',style: TextStyle(color: Colors.black),),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications,color: Colors.white,),
-            onPressed: () {
-              // Notification logic
-            },
+          Padding(
+            padding:  EdgeInsets.only(right: 14.r),
+            child: IconButton(
+              icon: const Icon(Icons.notifications,color: Colors.black,),
+              onPressed: () {
+                // Notification logic
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> NotificationScreen()));
+
+              },
+            ),
           ),
+
         ],
       ),
 
@@ -105,6 +126,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+
             SizedBox(height: 20.h,),
             // Carousel Slider
             CarouselSlider(
@@ -143,90 +165,137 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 );
               }).toList(),
             ),
-            SizedBox(height: 10.h),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.w),
-              child: Container(
-                width: double.maxFinite,
-                decoration: BoxDecoration(
-                  color: Colors.teal ,
-                  borderRadius: BorderRadius.circular(5.r),
-                ),
-                padding: EdgeInsets.symmetric(vertical: 4.r),
-                child: Center(
-                  child: Text(
-                    'Explore Events',
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      // fontWeight: FontWeight.bold,
-                      color: Colors.white,
+            // SizedBox(height: 20.h),
+            Container(
+              height:  0.62.sh,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.only(topRight: Radius.circular(50.r),topLeft: Radius.circular(50.r)),
+                border: Border(top: BorderSide(color: Colors.black,width: 2.r)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.shade300,
+                    blurRadius: 5.r,
+                    offset: Offset(-3, -3),
+                  ),
+                ],
+                color: Colors.white,
+                // color:Colors.indigoAccent.shade100,
+                // color:Colors.grey.shade900,
+                // color:Colors.grey.shade900,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                // mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(left: 30.w,top: 30.r,right: 30.w),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Explore Events',
+                          style: TextStyle(
+                            fontSize: 18.sp,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black,
+                            // color: Colors.white,
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            // InkWell(child: Icon(Icons.update,
+                            //   color: Colors.black,
+                            //   // color: Colors.white,
+                            // ),onTap: (){
+                            //   Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>UpdateEventsScreen()));
+                            // },),
+                            SizedBox(width: 10.w,),
+                            InkWell(child: Icon(Icons.person,
+                              color: Colors.black,
+                              // color: Colors.white,
+
+                            ),onTap: (){
+
+                              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>ProfileScreen()));
+
+                            },),
+
+
+                          ],
+                        ),
+
+                      ],
                     ),
                   ),
-                ),
+                  SizedBox(height: 20.h),
+                  // GridView Section
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      padding:  EdgeInsets.symmetric(horizontal: 16.r,vertical: 8.r),
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2, // Adjust columns based on screen size
+                        crossAxisSpacing: 24,
+                        mainAxisSpacing: 24,
+                      ),
+                      itemCount: eventCategories.length, // Total number of items
+                      itemBuilder: (context, index) {
+                        final event = eventCategories[index]; // Fetch event data from the list
+                        return _buildEventCard(
+                          context,
+                          title: event['title'],
+                          color: event['color'],
+                          imagePath: event['imagePath'],
+                          onTap: event['onTap'],
+                        );
+                      },
+                    ),
+                  ),
+
+                ],
               ),
-            ),
-            // SizedBox(height: 10.h),
-            // GridView Section
-            GridView.builder(
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              padding:  EdgeInsets.symmetric(horizontal: 16.r,vertical: 8.r),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2, // Adjust columns based on screen size
-                crossAxisSpacing: 24,
-                mainAxisSpacing: 24,
-              ),
-              itemCount: eventCategories.length, // Total number of items
-              itemBuilder: (context, index) {
-                final event = eventCategories[index]; // Fetch event data from the list
-                return _buildEventCard(
-                  context,
-                  title: event['title'],
-                  color: event['color'],
-                  imagePath: event['imagePath'],
-                  onTap: event['onTap'],
-                );
-              },
             ),
 
           ],
         ),
       ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        child: Container(
-          height: 44.h,
-          decoration: BoxDecoration(
-            color: Colors.teal,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: BottomNavigationBar(
-            currentIndex: _selectedIndex,
-            onTap: _onItemTapped,
-            backgroundColor: Colors.transparent, // Set to transparent for rounded container effect
-            elevation: 0, // Remove shadow
-            selectedItemColor: Colors.white,
-            unselectedItemColor: Colors.white70,
-            iconSize: 20.r,
-            selectedLabelStyle: TextStyle(fontSize: 10.sp),
-            unselectedLabelStyle: TextStyle(fontSize: 10.sp),
-            items: const [
-              BottomNavigationBarItem(
-                icon: Icon(Icons.update),
-                label: "Updates",
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.dashboard),
-                label: "Dashboard",
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.person),
-                label: "Profile",
-              ),
-            ],
-          ),
-        ),
-      ),
+      // bottomNavigationBar: Padding(
+      //   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      //   child: Container(
+      //     height: 44.h,
+      //     decoration: BoxDecoration(
+      //       color: Colors.teal,
+      //       borderRadius: BorderRadius.circular(10),
+      //     ),
+      //     child: BottomNavigationBar(
+      //       currentIndex: _selectedIndex,
+      //       onTap: _onItemTapped,
+      //       backgroundColor: Colors.transparent, // Set to transparent for rounded container effect
+      //       elevation: 0, // Remove shadow
+      //       selectedItemColor: Colors.white,
+      //       unselectedItemColor: Colors.white70,
+      //       iconSize: 20.r,
+      //       selectedLabelStyle: TextStyle(fontSize: 10.sp),
+      //       unselectedLabelStyle: TextStyle(fontSize: 10.sp),
+      //       items: const [
+      //         BottomNavigationBarItem(
+      //           icon: Icon(Icons.update),
+      //           label: "Updates",
+      //         ),
+      //         BottomNavigationBarItem(
+      //           icon: Icon(Icons.dashboard),
+      //           label: "Dashboard",
+      //         ),
+      //         BottomNavigationBarItem(
+      //           icon: Icon(Icons.person),
+      //           label: "Profile",
+      //         ),
+      //       ],
+      //     ),
+      //   ),
+      // ),
     );
   }
 
@@ -240,44 +309,55 @@ class _DashboardScreenState extends State<DashboardScreen> {
       }) {
     return GestureDetector(
       onTap: (){
-        Navigator.push(context, MaterialPageRoute(builder: (context){
-          return CulturalEventsScreen();
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context){
+          return const CulturalEventsScreen();
         }));
       },
       child: Container(
         decoration: BoxDecoration(
           color: color,
-          borderRadius: BorderRadius.circular(8.r),
+          borderRadius: BorderRadius.circular(20.r),
         ),
         child: Column(
           // mainAxisAlignment: MainAxisAlignment.center,
 
           children: [
+            // Padding(
+            //   padding: EdgeInsets.all(8.r),
+            //   child: Container(
+            //     width:double.maxFinite,
+            //     decoration: BoxDecoration(
+            //       color: Colors.white,
+            //       borderRadius: BorderRadius.circular(10.r),
+            //     ),
+            //     child:
+            //     Padding(
+            //       padding:  EdgeInsets.all(8.r),
+            //       child: Center(
+            //         child: Text(
+            //           title,
+            //           style:  TextStyle(fontSize: 16.sp, ),
+            //         ),
+            //       ),
+            //     ),
+            //   ),
+            // ),
+
+            SizedBox(height: 10.h,),
+            Image.asset(
+                imagePath,
+                height: 80.h
+            ), // Add proper image assets
+
             Padding(
-              padding: EdgeInsets.all(8.r),
-              child: Container(
-                width:double.maxFinite,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10.r),
-                ),
-                child: Padding(
-                  padding:  EdgeInsets.all(8.r),
-                  child: Center(
-                    child: Text(
-                      title,
-                      style:  TextStyle(fontSize: 16.sp, ),
-                    ),
-                  ),
+              padding:  EdgeInsets.all(8.r),
+              child: Center(
+                child: Text(
+                  title,
+                  style:  TextStyle(fontSize: 16.sp, ),
                 ),
               ),
             ),
-
-            Image.asset(
-                imagePath,
-                // height: 50
-            ), // Add proper image assets
-
           ],
         ),
       ),
@@ -291,7 +371,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       margin: EdgeInsets.symmetric(horizontal: 10.w),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15.r),
-        color: Colors.lightGreenAccent.shade100,
+        color: Colors.red[100],
         boxShadow: [
           BoxShadow(
             color: Colors.grey.shade300,

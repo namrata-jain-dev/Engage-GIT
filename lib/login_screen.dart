@@ -1,7 +1,15 @@
+import 'dart:convert';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:engage/sign_up_screen.dart';
+import 'package:engage/toast.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import 'auth_service.dart';
+import 'consts.dart';
 import 'dashboard.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -16,12 +24,29 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   bool isPasswordVisible = false; // For toggling password visibility
+  final _auth = AuthService();
+  bool _isLogIn = false ;
 
   @override
   void dispose() {
     emailController.dispose();
     passwordController.dispose();
     super.dispose();
+  }
+
+  void setUserData(User user) async{
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    // pref.setString('UserData', user);
+    Map<String, dynamic> userData = {
+      'uid': user.uid,
+      'email': user.email,
+      'displayName': user.displayName,
+      'photoURL': user.photoURL,
+    };
+
+    String jsonString = jsonEncode(userData);
+    await pref.setString(Constants().userDataKey, jsonString);
+    debugPrint('User data saved to SharedPreferences: $jsonString');
   }
 
   @override
@@ -120,14 +145,7 @@ class _LoginScreenState extends State<LoginScreen> {
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 30.w),
                 child: ElevatedButton(
-                  onPressed: () {
-                    // Add your login logic here
-                    print("Email: ${emailController.text}");
-                    print("Password: ${passwordController.text}");
-
-
-                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> DashboardScreen()));
-                  },
+                  onPressed: _logIn,
                   style: ButtonStyle(
                     padding: WidgetStatePropertyAll(EdgeInsets.zero),
                     minimumSize: WidgetStatePropertyAll(Size(140.w,30.h)),
@@ -152,7 +170,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       borderRadius: BorderRadius.circular(12), // Match the shape
                     ),
                     child: Center(
-                      child: Text(
+                      child: _isLogIn ? Padding(
+                        padding:  EdgeInsets.all(4.r),
+                        child: CircularProgressIndicator(color: Colors.white,),
+                      ) :Text(
                         'Log in',
                         style: TextStyle(
                           color: Colors.white, // Button text color
@@ -185,7 +206,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "Don't have an account ? ",
+                    "Don't have an account? ",
                     style: TextStyle(
                       fontSize: 12.sp,
                       color: Colors.black,
@@ -215,6 +236,61 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
+
+
+
+  void _logIn() async{
+    setState(() {
+      _isLogIn = true ;
+    });
+    String? email = emailController.text;
+    String? password = passwordController.text;
+
+      User? user = await _auth.logInUserWithEmailAndPassowrd(email, password);
+    setState(() {
+      _isLogIn = false ;
+    });
+      if(user != null){
+        debugPrint('User is logged in successfully');
+        debugPrint('User $user');
+        showToast(message: 'Logged in Successfully');
+
+        await user.reload(); // Refresh user state to get the latest emailVerified status
+        if (user.emailVerified) {
+          setUserData(user);
+
+          DocumentSnapshot doc =
+          await FirebaseFirestore.instance.collection('users').doc(user.email).get();
+
+          if (doc.exists) {
+            Map<String, dynamic>? data = doc.data() as Map<String, dynamic>?;
+            String? name =  data?["username"] as String?;
+            debugPrint('Name $name');
+          }
+
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> DashboardScreen())); // Navigate to home screen
+        } else {
+          showToast(message: 'Verify Email'); // Redirect to verify email screen
+        }
+
+      }else{
+        debugPrint('Some error occured in sign up user');
+        showToast(message: 'Error Occured');
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> LoginScreen()));
+      }
+  }
+
+  Future<void> resendVerificationEmail() async {
+    User? user = FirebaseAuth.instance.currentUser;
+
+    if (user != null && !user.emailVerified) {
+      await user.sendEmailVerification();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Verification email has been sent.')),
+      );
+    }
+  }
+
 }
 
 class TopShapeClipper extends CustomClipper<Path> {

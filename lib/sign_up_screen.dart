@@ -1,6 +1,10 @@
 
+import 'package:engage/auth_service.dart';
+import 'package:engage/toast.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'login_screen.dart';
 
@@ -13,6 +17,28 @@ class SignUpScreen extends StatefulWidget{
 
 }
 class SignUpScreenSt extends State<SignUpScreen>{
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController confirmPasswordController = TextEditingController();
+  bool isPasswordVisible = false; // For toggling password visibility
+  bool isSignUp = false ;
+
+
+  
+  final _auth = AuthService();
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    nameController.dispose();
+    passwordController.dispose();
+    confirmPasswordController.dispose();
+    super.dispose();
+  }
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -61,18 +87,19 @@ class SignUpScreenSt extends State<SignUpScreen>{
                 padding: EdgeInsets.symmetric(horizontal: 40.w),
                 child: Column(
                   children: [
-                    _buildTextField(hintText: "User Name"),
+                    _buildTextField(hintText: "User Name",controller: nameController),
                     SizedBox(height: 15.h),
-                    _buildTextField(hintText: "User Email"),
+                    _buildTextField(hintText: "User Email",controller: emailController),
                     SizedBox(height: 15.h),
-                    _buildTextField(hintText: "Password", obscureText: true),
+                    _buildTextField(hintText: "Password", obscureText: true,controller: passwordController),
                     SizedBox(height: 15.h),
-                    _buildTextField(hintText: "Confirm Password", obscureText: true),
+                    _buildTextField(hintText: "Confirm Password", obscureText: true,controller: confirmPasswordController),
                     SizedBox(height: 30.h),
                     // Sign Up Button
                     ElevatedButton(
                       onPressed: () {
                         // Define the action here
+                        _signUp();
                         print("Gradient Button Pressed");
                       },
                       style: ButtonStyle(
@@ -99,7 +126,10 @@ class SignUpScreenSt extends State<SignUpScreen>{
                           borderRadius: BorderRadius.circular(12), // Match the shape
                         ),
                         child: Center(
-                          child: Text(
+                          child:isSignUp ?Padding(
+                            padding:  EdgeInsets.all(4.r),
+                            child: CircularProgressIndicator(color: Colors.white,),
+                          ) : Text(
                             'Sign up',
                             style: TextStyle(
                               color: Colors.white, // Button text color
@@ -131,10 +161,42 @@ class SignUpScreenSt extends State<SignUpScreen>{
     );
   }
 
-  Widget _buildTextField({required String hintText, bool obscureText = false}) {
+
+  void _signUp() async{
+    setState(() {
+      isSignUp = true ;
+    });
+    String? userName = nameController.text ;
+    String? email = emailController.text;
+    String? password = passwordController.text;
+    String? confirmPassword = confirmPasswordController.text;
+
+
+    if(password == confirmPassword){
+      User? user = await _auth.createUserWithEmailAndPassowrd(email, password,userName);
+      setState(() {
+        isSignUp = false ;
+      });
+      if(user != null){
+        debugPrint('User is created successfully');
+        debugPrint('User $user');
+        showToast(message: 'Signed up Successfully');
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> LoginScreen()));
+      }else{
+        debugPrint('Some error occured in sign up user');
+        showToast(message: 'Error occurred');
+        // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> LoginScreen()));
+      }
+    }else{
+      return ;
+    }
+  }
+
+  Widget _buildTextField({required String hintText, bool obscureText = false,required TextEditingController controller}) {
     return SizedBox(
       height: 45.h,
       child: TextField(
+        controller: controller,
         obscureText: obscureText,
         decoration: InputDecoration(
           hintText: hintText,
@@ -142,6 +204,18 @@ class SignUpScreenSt extends State<SignUpScreen>{
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8.r),
           ),
+          suffixIcon: obscureText ? IconButton(
+            icon: Icon(
+              isPasswordVisible
+                  ? Icons.visibility
+                  : Icons.visibility_off,
+            ),
+            onPressed: () {
+              setState(() {
+                isPasswordVisible = !isPasswordVisible;
+              });
+            },
+          ) : SizedBox(),
         ),
       ),
     );

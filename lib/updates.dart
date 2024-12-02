@@ -1,22 +1,16 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:engage/auth_service.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import 'createEvent.dart';
 import 'dashboard.dart';
-import 'eventDetail.dart';
 
-
-class CulturalEventsScreen extends StatefulWidget {
-  const CulturalEventsScreen({Key? key}) : super(key: key);
+class UpdateEventsScreen extends StatefulWidget {
+  const UpdateEventsScreen({Key? key}) : super(key: key);
 
   @override
-  _CulturalEventsScreenState createState() => _CulturalEventsScreenState();
+  _UpdateEventsScreenState createState() => _UpdateEventsScreenState();
 }
 
-class _CulturalEventsScreenState extends State<CulturalEventsScreen> {
+class _UpdateEventsScreenState extends State<UpdateEventsScreen> {
   // Dummy data for cultural events
   final List<Map<String, String>> culturalEvents = [
     {"name": "Music Festival", "date": "December 10, 2024"},
@@ -28,19 +22,6 @@ class _CulturalEventsScreenState extends State<CulturalEventsScreen> {
 
   int _selectedIndex = 0;
 
-  String? role ;
-  User? user = FirebaseAuth.instance.currentUser ;
-  bool getRole = false ;
-
-  List<dynamic>? eventsInfo ;
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    getUserRole();
-    fetchEventAndSubcollection();
-  }
   // Method to handle bottom navigation bar item click
   void _onItemTapped(int index) {
     setState(() {
@@ -48,73 +29,47 @@ class _CulturalEventsScreenState extends State<CulturalEventsScreen> {
     });
   }
 
- List< Map<String, dynamic>?>? data = [] ;
-
-  void getUserRole() async {
-    setState(() {
-      getRole = true ;
-    });
-    DocumentSnapshot doc =
-        await FirebaseFirestore.instance.collection('users').doc(user!.email).get();
-    debugPrint('UserProfileDoc ${doc.data()}');
-    if (doc.exists) {
-      Map<String, dynamic>? data = doc.data() as Map<String, dynamic>?;
-      role =  data?["role"] as String?;
-      debugPrint('UserRole $role');
-    }
-    setState(() {
-      getRole = false ;
-    });
-  }
-
-  void fetchEventAndSubcollection() async {
-    DocumentSnapshot doc =
-    await FirebaseFirestore.instance.collection('events').doc('Cultural').get();
-
-    if (doc.exists) {
-      data!.add(
-          doc.data() as Map<String,dynamic>?
-      );
-      debugPrint('UserRole $data');
-    }
-
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      // drawer: Drawer(),
+
       appBar: AppBar(
-        leading: IconButton(onPressed: (){
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> DashboardScreen()));
-        },
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pushReplacement(context,
+                MaterialPageRoute(builder: (context) => DashboardScreen()));
+          },
           icon: Icon(Icons.keyboard_backspace_sharp),
         ),
-        iconTheme: IconThemeData(
-            color: Colors.black
-        ),
+        iconTheme: IconThemeData(color: Colors.black),
         backgroundColor: Colors.white,
-        title: const Text('Engage GIT',style: TextStyle(color: Colors.black),),
+        title: const Text(
+          'Engage GIT',
+          style: TextStyle(color: Colors.black),
+        ),
         actions: [
-          // IconButton(
-          //   icon: const Icon(Icons.notifications,color: Colors.black,),
-          //   onPressed: () {
-          //     // Notification logic
-          //   },
-          // ),
+          IconButton(
+            icon: const Icon(
+              Icons.notifications,
+              color: Colors.black,
+            ),
+            onPressed: () {
+              // Notification logic
+            },
+          ),
         ],
       ),
-      body: getRole ? Center(child: CircularProgressIndicator()) : Padding(
+      body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 16.w),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(height: 16.h),
             Padding(
-              padding:  EdgeInsets.only(left: 6.r),
+              padding: EdgeInsets.only(left: 6.r),
               child: Text(
-                "Cultural Events",
+                "Upcoming Events",
                 style: TextStyle(
                   fontSize: 18.sp,
                   fontWeight: FontWeight.bold,
@@ -124,18 +79,15 @@ class _CulturalEventsScreenState extends State<CulturalEventsScreen> {
             SizedBox(height: 8.h),
             Expanded(
               child: ListView.builder(
-                itemCount: data!.length,
+                itemCount: culturalEvents.length,
                 itemBuilder: (context, index) {
                   final event = culturalEvents[index];
                   return EventCard(
-                    name: data![0]!["eventName"] ?? '',
-                    // date: data!["eventDate"],
-                    date: data![0]!["eventDate"].toString() ??' ',
+                    name: event["name"]!,
+                    date: event["date"]!,
                     onTap: () {
                       // Handle card tap
-                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => EventScreen(
-                        eventDetail: data![0],
-                      )));
+                      // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => EventScreen()));
                       print("${event["name"]} tapped");
                     },
                   );
@@ -145,22 +97,9 @@ class _CulturalEventsScreenState extends State<CulturalEventsScreen> {
           ],
         ),
       ),
-      floatingActionButton: role == "ADMIN" ? FloatingActionButton(
-        backgroundColor: Colors.teal,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(50.r),
-        ),
-        onPressed: (){
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context){
-            return CreateEvent();
-          }));
-      },child: Icon(Icons.add_rounded,color: Colors.white,),)
-          : SizedBox(),
-
     );
   }
 }
-
 
 class EventCard extends StatelessWidget {
   final String name;
@@ -180,7 +119,7 @@ class EventCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         margin: EdgeInsets.symmetric(vertical: 8.h),
-        padding: EdgeInsets.all(16.w),
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 50.h),
         decoration: BoxDecoration(
           color: Colors.deepPurple[100],
           borderRadius: BorderRadius.circular(20.r),
@@ -202,11 +141,10 @@ class EventCard extends StatelessWidget {
                 Text(
                   name,
                   style: TextStyle(
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.bold,
-                    // color: Colors.white
-                    color: Colors.black
-                  ),
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.bold,
+                      // color: Colors.white
+                      color: Colors.black),
                 ),
                 SizedBox(height: 4.h),
                 Text(
@@ -214,7 +152,7 @@ class EventCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 14.sp,
                     color: Colors.black,
-                      // color: Colors.white,
+                    // color: Colors.white,
                   ),
                 ),
               ],

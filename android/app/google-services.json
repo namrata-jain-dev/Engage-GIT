@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "339195447974",
+    "project_id": "engage-git",
+    "storage_bucket": "engage-git.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:339195447974:android:8575f2aa296050bbd80267",
+        "android_client_info": {
+          "package_name": "com.example.engage"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA6EYfXVcqdIDzvWSPoZtInXKKI671CHqI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
