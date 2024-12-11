@@ -118,7 +118,8 @@ class _EventScreenState extends State<EventScreen> {
                 Icon(Icons.calendar_today, color: Colors.orange, size: 20.w),
                 SizedBox(width: 8.w),
                 Text(
-                    "${widget.eventDetail!['eventDate']}" ?? ' ',
+                    // "${widget.eventDetail!['eventDate']}" ?? ' ',
+                    "05-12-2024",
                     style: TextStyle(fontSize: 16.sp),
                 ),
               ],

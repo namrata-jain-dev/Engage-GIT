@@ -3,6 +3,8 @@ import 'package:engage/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:intl/intl.dart';
+
 
 import 'createEvent.dart';
 import 'dashboard.dart';
@@ -127,10 +129,15 @@ class _CulturalEventsScreenState extends State<CulturalEventsScreen> {
                 itemCount: data!.length,
                 itemBuilder: (context, index) {
                   final event = culturalEvents[index];
+                  // int timestampInSeconds = int.parse(data![0]!["eventDate"].toString().substring(20,40));  // Timestamp in seconds
+                  // DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(timestampInSeconds * 1000);
+                  // String formattedDate = DateFormat('yyyy-MM-dd').format(dateTime);
+                  String formattedDate = '05-12-2024';
+                  print(formattedDate); // Output: 2023-01-06
                   return EventCard(
                     name: data![0]!["eventName"] ?? '',
                     // date: data!["eventDate"],
-                    date: data![0]!["eventDate"].toString() ??' ',
+                    date: formattedDate ,
                     onTap: () {
                       // Handle card tap
                       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => EventScreen(
