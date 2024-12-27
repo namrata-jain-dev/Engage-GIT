@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:engage/auth_service.dart';
-import 'package:engage/dashboard.dart';
+
+import 'package:engage/event/dashboard.dart';
+import 'package:engage/login/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';

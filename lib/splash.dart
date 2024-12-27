@@ -1,9 +1,7 @@
 import 'dart:convert';
-
-import 'package:engage/consts.dart';
-import 'package:engage/dashboard.dart';
-import 'package:engage/login_screen.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:engage/event/dashboard.dart';
+import 'package:engage/login/login_screen.dart';
+import 'package:engage/utils/consts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shared_preferences/shared_preferences.dart';

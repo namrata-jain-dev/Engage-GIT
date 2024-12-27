@@ -1,14 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:engage/auth_service.dart';
+import 'package:engage/event/createEvent.dart';
+
+import 'package:engage/event/dashboard.dart';
+import 'package:engage/event/eventDetail.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
-
-
-import 'createEvent.dart';
-import 'dashboard.dart';
-import 'eventDetail.dart';
 
 
 class CulturalEventsScreen extends StatefulWidget {

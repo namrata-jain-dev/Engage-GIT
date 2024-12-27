@@ -1,6 +1,7 @@
 
-import 'package:engage/auth_service.dart';
-import 'package:engage/toast.dart';
+import 'package:engage/login/auth_service.dart';
+import 'package:engage/login/toast.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';

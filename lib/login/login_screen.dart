@@ -1,16 +1,18 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:engage/sign_up_screen.dart';
-import 'package:engage/toast.dart';
+import 'package:engage/event/dashboard.dart';
+import 'package:engage/login/sign_up_screen.dart';
+import 'package:engage/login/toast.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'auth_service.dart';
-import 'consts.dart';
-import 'dashboard.dart';
+import '../utils/consts.dart';
+
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);

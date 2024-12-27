@@ -1,18 +1,34 @@
 
-import 'package:engage/login_screen.dart';
-import 'package:engage/profile.dart';
-import 'package:engage/updates.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:engage/cultural%20event/cultural_fest.dart';
+import 'package:engage/login/auth_service.dart';
+import 'package:engage/login/profile.dart';
+import 'package:engage/notification.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+// import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-import 'auth_service.dart';
-import 'cultural_fest.dart';
-import 'notification.dart';
+mixin AppLocale {
+  static const String title = 'title';
+  static const String thisIs = 'thisIs';
 
-
+  static const Map<String, dynamic> EN = {
+    title: 'Localization',
+    thisIs: 'This is %a package, version %a.',
+  };
+  static const Map<String, dynamic> KM = {
+    title: 'ការធ្វើមូលដ្ឋានីយកម្ម',
+    thisIs: 'នេះគឺជាកញ្ចប់%a កំណែ%a.',
+  };
+  static const Map<String, dynamic> JA = {
+    title: 'ローカリゼーション',
+    thisIs: 'これは%aパッケージ、バージョン%aです。',
+  };
+  static const Map<String, dynamic> HI = {
+    title: 'स्थानीयकरण',
+    thisIs: 'यह %a पैकेज है, संस्करण %a।',
+  };
+}
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({Key? key}) : super(key: key);
@@ -22,6 +38,8 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
+  // final FlutterLocalization _localization = FlutterLocalization.instance;
+
   final List<String> sliderItems = [
     "Cultural Events",
     "Sports Events",
@@ -80,6 +98,45 @@ class _DashboardScreenState extends State<DashboardScreen> {
   ];
 
 
+  @override
+  void initState() {
+    // _localization.init(
+    //   mapLocales: [
+    //     const MapLocale(
+    //       'en',
+    //       AppLocale.EN,
+    //       countryCode: 'US',
+    //       fontFamily: 'Font EN',
+    //     ),
+    //     const MapLocale(
+    //       'km',
+    //       AppLocale.KM,
+    //       countryCode: 'KH',
+    //       fontFamily: 'Font KM',
+    //     ),
+    //     const MapLocale(
+    //       'ja',
+    //       AppLocale.JA,
+    //       countryCode: 'JP',
+    //       fontFamily: 'Font JA',
+    //     ),
+    //     const MapLocale(
+    //       'hi',
+    //       AppLocale.HI,
+    //       countryCode: 'IN',
+    //       fontFamily: 'Font HI',
+    //     ),
+    //   ],
+    //   initLanguageCode: 'en',
+    // );
+    // _localization.onTranslatedLanguage = _onTranslatedLanguage;
+    super.initState();
+  }
+
+  void _onTranslatedLanguage(Locale? locale) {
+    setState(() {});
+  }
+
   int _selectedIndex = 0;
 
   // Method to handle bottom navigation bar item click
@@ -118,6 +175,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
               },
             ),
           ),
+
+            PopupMenuButton<String>(
+              icon: const Icon(Icons.language),
+              onSelected: (String value) {
+                // _localization.translate(value);
+              },
+              itemBuilder: (BuildContext context) => [
+                const PopupMenuItem(value: 'en', child: Text('English')),
+                const PopupMenuItem(value: 'km', child: Text('ភាសាខ្មែរ')),
+                const PopupMenuItem(value: 'ja', child: Text('日本語')),
+                const PopupMenuItem(value: 'hi', child: Text('हिंदी')),
+              ],
+            ),
+
 
         ],
       ),
